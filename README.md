@@ -21,14 +21,6 @@ This portfolio project is fully functional and intended to be testable by recrui
 - **Phase 7:** Linux deployment + documentation
 - **Phase 8:** Automated tests
 
-## 🗺️ Initial architecture diagram
-```mermaid
-flowchart LR
-A[User] -->|HTTP| B[Frontend (HTML/CSS/JS)]
-B -->|fetch/REST| C[Java Backend]
-C --> D[(Database)]
-C --> E[Authentication/Authorization]
-
 ---
 
 👤 Author: Endrius-Albert
