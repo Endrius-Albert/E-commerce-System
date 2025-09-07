@@ -14,12 +14,14 @@ import com.google.gson.Gson;
 public class ProductServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    private ProductDAO productDAO = new ProductDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
 
-        List<Product> products = Product.getAllProducts(); 
-        System.out.println("Products from backend: " + products);
+        List<Product> products = productDAO.getAllProducts(); 
+        System.out.println("Products from DB: " + products);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
