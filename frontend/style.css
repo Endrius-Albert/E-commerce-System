@@ -36,26 +36,33 @@ header nav a:hover {
 main {
   display: flex;
   flex: 1;
-  padding: 1rem;
+  padding: 1rem 2rem;
+  gap: 2rem;
   min-height: calc(100vh - 70px);
-  gap: 1rem;
+}
+
+
+#products {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
 }
 
 #product-list {
-  flex: 3;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* menor largura mínima */
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  justify-items: stretch;
 }
+
 
 .card {
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 0.6rem; /* menor padding */
+  padding: 0.6rem;
   text-align: center;
   background: #fff;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  max-height: 180px; /* limita altura */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -87,7 +94,7 @@ main {
 }
 
 #cart {
-  flex: 1;
+  width: 300px;
   background: #f8f8f8;
   padding: 1rem;
   border-left: 2px solid #ddd;
@@ -104,4 +111,20 @@ main {
 
 #cart li {
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+}
+
+#cart li .item-name {
+  flex: 1; 
+  margin-right: 0.5rem; 
+}
+
+#cart li input[type="number"] {
+  width: 50px;
+}
+
+#cart li button {
+  margin-left: 0.5rem;
 }
