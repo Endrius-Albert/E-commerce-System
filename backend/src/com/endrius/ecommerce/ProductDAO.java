@@ -29,7 +29,6 @@ public class ProductDAO {
         return products;
     }
 
-    
     public void addProduct(Product product) {
         String sql = "INSERT INTO products (name, price, stock) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -48,6 +47,20 @@ public class ProductDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateProduct(Product product) {
+        String sql = "UPDATE products SET name = ?, price = ?, stock = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, product.getName());
+            stmt.setDouble(2, product.getPrice());
+            stmt.setInt(3, product.getStock());
+            stmt.setInt(4, product.getId());
             stmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

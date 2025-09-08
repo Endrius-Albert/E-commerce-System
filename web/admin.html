@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+</head>
+<body>
+  <h1>Admin Panel</h1>
+
+  <h2>Add Product</h2>
+  <form id="addProductForm">
+    Name: <input type="text" name="name" required><br>
+    Price: <input type="number" step="0.01" name="price" required><br>
+    Stock: <input type="number" name="stock" required><br>
+    <button type="submit">Add Product</button>
+  </form>
+
+  <h2>Products</h2>
+  <table id="productsTable" border="1">
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Price</th><th>Stock</th><th>Actions</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function loadProducts() {
+      try {
+        const res = await fetch('/ECommerce/admin/products');
+        const products = await res.json();
+        const tbody = document.querySelector('#productsTable tbody');
+        tbody.innerHTML = '';
+
+        products.forEach(p => {
+          tbody.innerHTML += `<tr>
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>${p.price}</td>
+            <td>${p.stock}</td>
+            <td>
+              <button onclick="editProduct(${p.id}, '${p.name}', ${p.price}, ${p.stock})">Edit</button>
+              <button onclick="deleteProduct(${p.id})">Delete</button>
+            </td>
+          </tr>`;
+        });
+      } catch(err) {
+        console.error(err);
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+      await fetch('/ECommerce/admin/products/' + id, { method: 'DELETE' });
+      loadProducts();
+    }
+
+    async function editProduct(id, currentName, currentPrice, currentStock) {
+      const name = prompt("Enter new name:", currentName);
+      if (name === null) return;
+
+      const price = prompt("Enter new price:", currentPrice);
+      if (price === null) return;
+
+      const stock = prompt("Enter new stock:", currentStock);
+      if (stock === null) return;
+
+      const data = new URLSearchParams();
+      data.append("name", name);
+      data.append("price", price);
+      data.append("stock", stock);
+
+      await fetch('/ECommerce/admin/products/' + id, { method: 'PUT', body: data });
+      loadProducts();
+    }
+
+    document.getElementById('addProductForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = new URLSearchParams(new FormData(form));
+      await fetch('/ECommerce/admin/products', { method: 'POST', body: data });
+      form.reset();
+      loadProducts();
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>

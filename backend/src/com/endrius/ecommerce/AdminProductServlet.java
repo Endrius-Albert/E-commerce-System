@@ -36,7 +36,6 @@ public class AdminProductServlet extends HttpServlet {
         double price = Double.parseDouble(request.getParameter("price"));
         int stock = Integer.parseInt(request.getParameter("stock"));
 
-        
         Product product = new Product(0, name, price, stock);
         productDAO.addProduct(product);
 
@@ -46,11 +45,51 @@ public class AdminProductServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String pathInfo = request.getPathInfo(); 
+        String pathInfo = request.getPathInfo();
         if (pathInfo != null && pathInfo.length() > 1) {
             int id = Integer.parseInt(pathInfo.substring(1));
             productDAO.deleteProduct(id);
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo(); // /{id}
+        if (pathInfo != null && pathInfo.length() > 1) {
+            int id = Integer.parseInt(pathInfo.substring(1));
+
+           
+            StringBuilder sb = new StringBuilder();
+            String line;
+            try (var reader = request.getReader()) {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+            String[] params = sb.toString().split("&");
+            String name = null;
+            double price = 0;
+            int stock = 0;
+            for (String param : params) {
+                String[] pair = param.split("=");
+                if (pair.length != 2) continue;
+                String key = pair[0];
+                String value = java.net.URLDecoder.decode(pair[1], "UTF-8");
+                switch (key) {
+                    case "name": name = value; break;
+                    case "price": price = Double.parseDouble(value); break;
+                    case "stock": stock = Integer.parseInt(value); break;
+                }
+            }
+
+            Product updatedProduct = new Product(id, name, price, stock);
+            productDAO.updateProduct(updatedProduct);
+
+            response.setStatus(HttpServletResponse.SC_OK);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
         }
