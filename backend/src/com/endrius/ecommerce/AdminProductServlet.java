@@ -3,14 +3,14 @@ package com.endrius.ecommerce;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import com.google.gson.Gson;
 
-@WebServlet("/admin/products/*")
 public class AdminProductServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private ProductDAO productDAO = new ProductDAO();
@@ -62,7 +62,6 @@ public class AdminProductServlet extends HttpServlet {
         if (pathInfo != null && pathInfo.length() > 1) {
             int id = Integer.parseInt(pathInfo.substring(1));
 
-           
             StringBuilder sb = new StringBuilder();
             String line;
             try (var reader = request.getReader()) {

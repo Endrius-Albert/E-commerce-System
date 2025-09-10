@@ -1,24 +1,8 @@
+
 let cart = [];
 
-function renderProducts(products) {
-  const productList = document.getElementById("product-list");
-  productList.innerHTML = "";
 
-  products.forEach(product => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <h3>${product.name}</h3>
-      <p>Price: $${product.price}</p>
-      <button onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
-    `;
-
-    productList.appendChild(card);
-  });
-}
-
-function addToCart(id, name, price) {
+window.addToCart = function(id, name, price) {
   const existing = cart.find(item => item.id === id);
   if (existing) {
     existing.quantity = (existing.quantity || 1) + 1;
@@ -26,7 +10,7 @@ function addToCart(id, name, price) {
     cart.push({ id, name, price, quantity: 1 });
   }
   updateCart();
-}
+};
 
 function updateCart() {
   const cartItems = document.getElementById("cart-items");
@@ -38,21 +22,23 @@ function updateCart() {
   cart.forEach((item, index) => {
     const li = document.createElement("li");
 
-    
-    const nameSpan = document.createElement("span");
-    nameSpan.className = "item-name";
-    nameSpan.textContent = `${item.name} - $${item.price}`;
-
+   
+    const span = document.createElement("span");
+    span.textContent = `${item.name} - $${item.price}`;
+    li.appendChild(span);
 
     const qtyInput = document.createElement("input");
     qtyInput.type = "number";
     qtyInput.min = 1;
     qtyInput.value = item.quantity || 1;
     qtyInput.addEventListener("change", (e) => {
-      item.quantity = parseInt(e.target.value);
-      updateCart();
+      const value = parseInt(e.target.value);
+      if (value > 0) {
+        item.quantity = value;
+        updateCart();
+      }
     });
-
+    li.appendChild(qtyInput);
 
     const removeBtn = document.createElement("button");
     removeBtn.textContent = "Remove";
@@ -60,23 +46,49 @@ function updateCart() {
       cart.splice(index, 1);
       updateCart();
     });
-
-    li.appendChild(nameSpan);
-    li.appendChild(qtyInput);
     li.appendChild(removeBtn);
 
     cartItems.appendChild(li);
 
-    const qty = item.quantity || 1;
-    total += item.price * qty;
+    total += item.price * (item.quantity || 1);
   });
 
   cartTotal.textContent = total.toFixed(2);
 }
 
+function renderProducts(products) {
+  const productList = document.getElementById("product-list");
+  productList.innerHTML = "";
+
+  products.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    
+    const nameEl = document.createElement("h3");
+    nameEl.textContent = product.name;
+    const priceEl = document.createElement("p");
+    priceEl.textContent = `Price: $${product.price}`;
+
+
+    const btn = document.createElement("button");
+    btn.textContent = "Add to Cart";
+    btn.addEventListener("click", () => addToCart(product.id, product.name, product.price));
+
+ 
+    card.appendChild(nameEl);
+    card.appendChild(priceEl);
+    card.appendChild(btn);
+
+    productList.appendChild(card);
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("/ECommerce/products")
+  
+  const url = `${window.location.origin}/ECommerce/products`;
+
+  fetch(url)
     .then(response => response.json())
     .then(data => {
       console.log("Products received from backend:", data);
@@ -84,4 +96,3 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(error => console.error("Error fetching products:", error));
 });
-
