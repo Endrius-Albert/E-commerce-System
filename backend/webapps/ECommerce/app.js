@@ -1,6 +1,4 @@
-
 let cart = [];
-
 
 window.addToCart = function(id, name, price) {
   const existing = cart.find(item => item.id === id);
@@ -22,7 +20,6 @@ function updateCart() {
   cart.forEach((item, index) => {
     const li = document.createElement("li");
 
-   
     const span = document.createElement("span");
     span.textContent = `${item.name} - $${item.price}`;
     li.appendChild(span);
@@ -64,18 +61,15 @@ function renderProducts(products) {
     const card = document.createElement("div");
     card.className = "card";
 
-    
     const nameEl = document.createElement("h3");
     nameEl.textContent = product.name;
     const priceEl = document.createElement("p");
     priceEl.textContent = `Price: $${product.price}`;
 
-
     const btn = document.createElement("button");
     btn.textContent = "Add to Cart";
     btn.addEventListener("click", () => addToCart(product.id, product.name, product.price));
 
- 
     card.appendChild(nameEl);
     card.appendChild(priceEl);
     card.appendChild(btn);
@@ -85,8 +79,7 @@ function renderProducts(products) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  
-  const url = `${window.location.origin}/ECommerce/products`;
+  const url = "/ECommerce/products";
 
   fetch(url)
     .then(response => response.json())
