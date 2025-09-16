@@ -1,24 +1,27 @@
 package com.endrius.ecommerce;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class User {
+
     private int id;
     private String name;
     private String email;
+    private String password;
+    private String role;
 
-    // In-memory storage for all users
-    private static List<User> users = new ArrayList<>();
 
-    // Constructor
-    public User(int id, String name, String email) {
+    public User(int id, String name, String email, String password, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
-    // Getters and setters
+
+    public User(String name, String email, String password, String role) {
+        this(0, name, email, password, role);
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -28,37 +31,9 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    // === CRUD Operations ===
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    // Create / Add a user
-    public static void addUser(User u) {
-        users.add(u);
-    }
-
-    // Read / Get all users
-    public static List<User> getAllUsers() {
-        return users;
-    }
-
-    // Read / Get user by ID
-    public static User getUserById(int id) {
-        for (User u : users) {
-            if (u.getId() == id) return u;
-        }
-        return null;
-    }
-
-    // Update user 
-    public static void updateUser(int id, String newName, String newEmail) {
-        User u = getUserById(id);
-        if (u != null) {
-            u.setName(newName);
-            u.setEmail(newEmail);
-        }
-    }
-
-    // Delete user by ID
-    public static void removeUser(int id) {
-        users.removeIf(u -> u.getId() == id);
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }

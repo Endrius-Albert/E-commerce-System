@@ -1,37 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="ECommerce" default="war" basedir=".">
 
-    <!-- Directory -->
+
     <property name="src.dir" value="backend/src"/>
     <property name="build.dir" value="build"/>
     <property name="dist.dir" value="dist"/>
     <property name="web.dir" value="backend/webapps/ECommerce"/>
     <property name="lib.dir" value="libs"/>
 
-    <!-- Clean -->
+  
     <target name="clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
     </target>
 
-    <!-- Compilation -->
     <target name="compile">
         <mkdir dir="${build.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" encoding="UTF-8">
             <classpath>
+            
                 <fileset dir="${lib.dir}" includes="*.jar"/>
             </classpath>
         </javac>
     </target>
 
-    <!-- WAR -->
     <target name="war" depends="compile">
         <mkdir dir="${dist.dir}"/>
         <war destfile="${dist.dir}/ECommerce.war" webxml="${web.dir}/WEB-INF/web.xml">
-            <!-- Recursos estáticos -->
+           
             <fileset dir="${web.dir}" excludes="WEB-INF/lib/**"/>
-            <!-- Classes compiladas -->
+         
             <classes dir="${build.dir}"/>
-            <!-- Bibliotecas -->
+           
             <lib dir="${lib.dir}" includes="*.jar"/>
         </war>
     </target>

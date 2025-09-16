@@ -5,70 +5,46 @@ import java.util.List;
 
 public class Order {
     private int id;
-    private int userId;
-    private List<Product> products;
-    private double totalPrice;
+    private User user;
+    private List<OrderItem> items;
+    private double total;
 
-    
-    private static List<Order> orders = new ArrayList<>();
-
-    public Order(int id, int userId, List<Product> products) {
+    public Order(int id, User user) {
         this.id = id;
-        this.userId = userId;
-        this.products = products;
-        this.totalPrice = calculateTotal(products);
+        this.user = user;
+        this.items = new ArrayList<>();
     }
 
-  
-    private double calculateTotal(List<Product> products) {
-        double sum = 0;
-        for (Product p : products) {
-            sum += p.getPrice();
-        }
-        return sum;
+    public Order(User user) {
+        this.user = user;
+        this.items = new ArrayList<>();
     }
 
-  
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
-
-    public List<Product> getProducts() { return products; }
-    public void setProducts(List<Product> products) {
-        this.products = products;
-        this.totalPrice = calculateTotal(products);
+    public int getId() {
+        return id;
     }
 
-    public double getTotalPrice() { return totalPrice; }
-
-  
-    public static void addOrder(Order o) {
-        orders.add(o);
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public static List<Order> getAllOrders() {
-        return orders;
+    public User getUser() {
+        return user;
     }
 
-    public static Order getOrderById(int id) {
-        for (Order o : orders) {
-            if (o.getId() == id) return o;
-        }
-        return null;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-
-    public static void updateOrder(int id, List<Product> newProducts) {
-        Order o = getOrderById(id);
-        if (o != null) {
-            o.setProducts(newProducts);
-        }
+    public void addItem(Product product, int quantity) {
+        items.add(new OrderItem(product, quantity));
     }
 
+    public double getTotal() {
+        return total;
+    }
 
-    public static void removeOrder(int id) {
-        orders.removeIf(o -> o.getId() == id);
+    public void setTotal(double total) {
+        this.total = total;
     }
 }

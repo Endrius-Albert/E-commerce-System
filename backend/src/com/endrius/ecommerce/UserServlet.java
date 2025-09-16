@@ -6,31 +6,35 @@ import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.List;
 
-public class ProductServlet extends HttpServlet {
-    private ProductDAO productDAO = new ProductDAO();
+
+public class UserServlet extends HttpServlet {
+    private UserDAO userDAO = new UserDAO();
     private Gson gson = new Gson();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json;charset=UTF-8");
-        List<Product> products = productDAO.getAllProducts();
-        resp.getWriter().write(gson.toJson(products));
+        List<User> users = userDAO.getAllUsers();
+        resp.getWriter().write(gson.toJson(users));
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json;charset=UTF-8");
-        Product product = gson.fromJson(req.getReader(), Product.class);
-        productDAO.addProduct(product);
+        User user = gson.fromJson(req.getReader(), User.class);
+        userDAO.addUser(user);
         resp.setStatus(HttpServletResponse.SC_CREATED);
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json;charset=UTF-8");
-        Product product = gson.fromJson(req.getReader(), Product.class);
-        productDAO.updateProduct(product);
-        resp.setStatus(HttpServletResponse.SC_OK);
+        User user = gson.fromJson(req.getReader(), User.class);
+        if (userDAO.updateUser(user)) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
     @Override
@@ -39,8 +43,11 @@ public class ProductServlet extends HttpServlet {
         String pathInfo = req.getPathInfo();
         if (pathInfo != null && pathInfo.length() > 1) {
             int id = Integer.parseInt(pathInfo.substring(1));
-            productDAO.deleteProduct(id);
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            if (userDAO.deleteUser(id)) {
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
         } else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }

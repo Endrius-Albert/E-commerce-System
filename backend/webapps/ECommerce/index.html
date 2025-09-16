@@ -10,27 +10,33 @@
   <header>
     <h1>🛒 E-commerce</h1>
     <nav>
-      <a href="#">Home</a>
-      <a href="#products">Products</a>
-      <a href="#cart">Cart</a>
+      <button id="menu-products">Products</button>
+      <button id="menu-users">Users</button>
+      <button id="menu-orders">Orders</button>
     </nav>
   </header>
 
   <main>
-    <section id="products">
+ 
+    <section id="products-section" class="section">
       <h2>Products</h2>
       <div id="product-list"></div>
     </section>
 
-    <aside id="cart">
-      <h2>Your Cart</h2>
-      <ul id="cart-items"></ul>
-      <p>Total: $<span id="cart-total">0.00</span></p>
-    </aside>
+   
+    <section id="users-section" class="section"></section>
+
+    
+    <section id="orders-section" class="section"></section>
   </main>
+
+  
+  <aside id="cart-section">
+    <h2>Your Cart</h2>
+    <ul id="cart-items"></ul>
+    <p>Total: $<span id="cart-total">0.00</span></p>
+  </aside>
 
   <script src="app.js"></script>
 </body>
 </html>
-
-

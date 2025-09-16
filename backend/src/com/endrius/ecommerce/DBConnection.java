@@ -2,18 +2,26 @@ package com.endrius.ecommerce;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DBConnection {
-    private static final String DB_HOST = System.getenv().getOrDefault("DB_HOST", "db");
-    private static final String DB_PORT = System.getenv().getOrDefault("DB_PORT", "3306");
-    private static final String DB_NAME = System.getenv().getOrDefault("DB_NAME", "ecommerce_db");
-    private static final String USER = System.getenv().getOrDefault("DB_USER", "ecommerce_user");
-    private static final String PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", "36513411");
 
-    private static final String URL = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?useSSL=false&serverTimezone=UTC";
+   private static final String URL = String.format(
+    "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC",
+    System.getenv().getOrDefault("DB_HOST", "db"),
+    System.getenv().getOrDefault("DB_PORT", "3306"),
+    System.getenv().getOrDefault("DB_NAME", "ecommerce_db")
+);
+private static final String USER = System.getenv().getOrDefault("DB_USER", "ecommerce");
+private static final String PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", "36513411");
 
-    public static Connection getConnection() throws Exception {
-        Class.forName("com.mysql.cj.jdbc.Driver");
+    public static Connection getConnection() throws SQLException {
+        try {
+            
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
