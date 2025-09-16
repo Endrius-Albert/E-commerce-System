@@ -40,19 +40,30 @@ jobs:
       - name: Build WAR with Ant
         run: ant war
 
+      - name: Build backend Docker image
+        run: docker build -t ecommerce-backend:latest .
+
       - name: Start backend container
         run: |
-          docker run -d --name ecommerce_backend -p 8081:8080 ecommerce-backend:latest
+          docker run -d --name ecommerce_backend --network host \
+          -e DB_HOST=127.0.0.1 \
+          -e DB_PORT=3306 \
+          -e DB_NAME=ecommerce \
+          -e DB_USER=ecommerce \
+          -e DB_PASSWORD=ecommerce \
+          ecommerce-backend:latest
 
-      - name: Wait for backend
+      - name: Wait for backend to be ready
         run: |
-          for i in {1..30}; do
-            curl -f http://localhost:8081/ECommerce/ && break || sleep 2
+          for i in {1..60}; do
+            docker exec ecommerce_backend curl -f http://localhost:8080/ECommerce/ && break || sleep 2
           done
 
-      - name: Test backend HTTP
-        run: |
-          curl -f http://localhost:8081/ECommerce/
+      - name: Test backend HTTP inside container
+        run: docker exec ecommerce_backend curl -f http://localhost:8080/ECommerce/
+
+      - name: Cleanup backend container
+        run: docker rm -f ecommerce_backend
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -60,8 +71,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/ecommerce-backend:latest .
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecommerce-backend:latest
+      - name: Tag and push Docker image
+        run: |
+          docker tag ecommerce-backend:latest ${{ secrets.DOCKER_HUB_USERNAME }}/ecommerce-backend:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecommerce-backend:latest
