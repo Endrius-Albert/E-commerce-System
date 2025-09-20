@@ -33,16 +33,18 @@ jobs:
       - name: Build Docker image
         run: docker build -t ecommerce-backend:latest .
 
-      - name: Set up K3d cluster
-        uses: k3d-io/k3d-action@v5
-        with:
-          version: '5.5.2'
-          cluster-name: ${{ env.K3D_CLUSTER_NAME }}
+      - name: Install K3d
+        run: |
+          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+          k3d --version
+
+      - name: Create K3d cluster
+        run: k3d cluster create $K3D_CLUSTER_NAME --wait
 
       - name: Configure kubeconfig
         run: |
           k3d kubeconfig get $K3D_CLUSTER_NAME > kubeconfig.yaml
-          export KUBECONFIG=$PWD/kubeconfig.yaml
+          echo "KUBECONFIG=$PWD/kubeconfig.yaml" >> $GITHUB_ENV
           kubectl cluster-info
 
       - name: Deploy MySQL
@@ -52,11 +54,8 @@ jobs:
           kubectl apply -f k8s/mysql-pvc.yaml
           kubectl apply -f k8s/mysql-deployment.yaml
           kubectl apply -f k8s/mysql-service.yaml
-
-      - name: Wait for MySQL to be ready
-        run: |
-          echo "Waiting for MySQL..."
-          kubectl wait --for=condition=ready pod -l app=mysql -n ecommerce --timeout=180s
+          kubectl wait --for=condition=ready pod -l app=mysql -n ecommerce --timeout=300s
+          kubectl get pods -n ecommerce
 
       - name: Deploy Backend
         run: |
@@ -64,6 +63,7 @@ jobs:
           kubectl apply -f k8s/backend-deployment.yaml
           kubectl apply -f k8s/backend-service.yaml
           kubectl wait --for=condition=ready pod -l app=ecommerce-backend -n ecommerce --timeout=180s
+          kubectl get pods -n ecommerce
 
       - name: Test /products endpoint
         run: |
@@ -74,13 +74,3 @@ jobs:
             echo "Error: /products endpoint returned empty list"
             exit 1
           fi
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Push Docker image
-        run: docker tag ecommerce-backend:latest ${{ secrets.DOCKER_HUB_USERNAME }}/ecommerce-backend:latest
-      - run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ecommerce-backend:latest
