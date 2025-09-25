@@ -12,11 +12,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      MYSQL_USER: ecommerce
-      MYSQL_PASSWORD: 36513411
-      MYSQL_ROOT_PASSWORD: rootpassword
-      DB_NAME: ecommerce_db
       K3D_CLUSTER_NAME: ecommerce-cluster
+      INGRESS_PORT: 18081
 
     steps:
       - uses: actions/checkout@v3
@@ -47,7 +44,7 @@ jobs:
           echo "KUBECONFIG=$PWD/kubeconfig.yaml" >> $GITHUB_ENV
           kubectl cluster-info
 
-      - name: Deploy E-commerce to K8s
+      - name: Deploy E-commerce full stack
         run: |
           kubectl apply -f k8s/ecommerce-full.yaml
           kubectl apply -f k8s/ingress.yaml
@@ -56,8 +53,10 @@ jobs:
         run: |
           kubectl wait --namespace ecommerce --for=condition=ready pod -l app=ecommerce-backend --timeout=120s
 
-      - name: Test Backend with curl
+      - name: Test Backend via Ingress with port-forward
         run: |
-          BACKEND_IP=$(kubectl get svc ecommerce-backend -n ecommerce -o jsonpath='{.spec.clusterIP}')
-          echo "Testing backend at $BACKEND_IP"
-          curl -sS http://$BACKEND_IP:8080/ECommerce/ | grep -q "E-commerce System"
+          kubectl port-forward -n kube-system svc/traefik $INGRESS_PORT:80 &
+          PF_PID=$!
+          sleep 5
+          curl -H "Host: ecommerce.local" http://localhost:$INGRESS_PORT/ECommerce/ | grep -q "E-commerce System"
+          kill $PF_PID
